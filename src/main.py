@@ -1,42 +1,30 @@
 import flet as ft
-
-"""
-- Ja sei:
-- Um app que pego uma imagem, anexo, e ele retorna a paleta de cores
-- futuramente: jogo um texto, e ele retorna as paletas de cores
-
-
----
-COMO VAI FUNCIONAR?
-
-CAMPOS:
-[TITULO]
-[DESCRIÇÃO]
-
-[campo para adicionar imagem] [ao lado, ou em baixo, um espaço que va vir a paleta de cores]
-- botão para gerar paleta de cores
-
-instalei:
-flet
-requests
-
-"""
+import requests
 
 def main(page: ft.Page):
-    # TEXTOS
-    t = ft.Text(value="Paleta Visual", color="Yellow", size=30)
-    t.font_family = "Arial"
-    t.font_size = 30
-    t.font_weight = "bold"
+    page.bgcolor = "black"
+    page.scroll = "auto"
 
-    d = ft.Text(value="Selecione uma imagem e gere uma paleta de cores", color="White", size=25)
-    d.font_family = "Arial"
-    d.font_weight = "bold"
-    page.controls.append(t)
-    page.controls.append(d)
-    page.update()
+    # TÍTULO E DESCRIÇÃO
+    t = ft.Text(value="Paleta Visual", color="Yellow", size=30, font_family="Arial", weight="bold")
+    d = ft.Text(value="Selecione uma imagem e gere uma paleta de cores", color="White", size=25, font_family="Arial", weight="bold")
 
-    # CONFIGURANDO A GRID
+
+    # IMAGEM SELECIONADA QUE APARECE EMBAIXO
+    imagem_selecionada = ft.Image(
+        src="https://cataas.com/cat",  # valor padrão
+        width=450,
+        height=450,
+        fit=ft.ImageFit.COVER,
+        border_radius=10
+    )
+
+    # FUNÇÃO PARA ATUALIZAR IMAGEM
+    def atualizar_imagem(e, s):
+        imagem_selecionada.src = f"https://cataas.com/cat/{s}"
+        imagem_selecionada.update() # isso que tava dando errado antes, tem que atualizar a imagem "tela" quando muda
+
+    # GRID DE IMAGENS
     images = ft.GridView(
         height=450,
         width=450,
@@ -47,195 +35,98 @@ def main(page: ft.Page):
         run_spacing=10,
     )
 
-    lista_fotos = [
-  {
-    "id": "04eEQhDfAL8l5nt3",
-    "tags": [
-      "two",
-      "double",
-      "black"
-    ],
-    "mimetype": "image/jpeg",
-    "createdAt": "2022-07-18T11:28:29.596Z"
-  },
-  {
-    "id": "05Xd4JtN14983pns",
-    "tags": [
-      "Cute"
-    ],
-    "mimetype": "image/jpeg",
-    "createdAt": "2024-05-27T17:55:08.552Z"
-  },
-  {
-    "id": "09wFxpacQzvf9jfM",
-    "tags": [
-      "Maskcat"
-    ],
-    "mimetype": "image/jpeg",
-    "createdAt": "2021-08-17T06:26:37.959Z"
-  },
-  {
-    "id": "0B2g7aTANObiqPJJ",
-    "tags": [
-      "creation"
-    ],
-    "mimetype": "image/jpeg",
-    "createdAt": "2016-11-25T03:46:12.562Z"
-  },
-  {
-    "id": "0BTTVEVWXNyOgXYd",
-    "tags": [],
-    "mimetype": "image/jpeg",
-    "createdAt": "2020-10-19T18:52:55.627Z"
-  },
-  {
-    "id": "0C2bQ39x8kuhx31p",
-    "tags": [
-      "sara",
-      "looking"
-    ],
-    "mimetype": "image/jpeg",
-    "createdAt": "2021-11-11T10:16:22.061Z"
-  },
-  {
-    "id": "0DVs2d6bIVIt3ehk",
-    "tags": [
-      "birthday",
-      "cake",
-      "happy"
-    ],
-    "mimetype": "image/gif",
-    "createdAt": "2024-02-06T20:07:13.052Z"
-  },
-  {
-    "id": "0EsIYDG0at0TPpPD",
-    "tags": [
-      "fat"
-    ],
-    "mimetype": "image/jpeg",
-    "createdAt": "2022-03-26T23:13:25.966Z"
-  },
-  {
-    "id": "0F0IKAPOdWiE755P",
-    "tags": [
-      "meet",
-      "cute"
-    ],
-    "mimetype": "image/jpeg",
-    "createdAt": "2024-06-18T09:46:45.702Z"
-  },
-  {
-    "id": "0GC9MRUAqxhBzPyA",
-    "tags": [
-      "cute"
-    ],
-    "mimetype": "image/png",
-    "createdAt": "2024-09-15T15:45:25.375Z"
-  },
-  {
-    "id": "0M0Lo3dsYft79xNd",
-    "tags": [
-      "black",
-      "funny",
-      "oriental"
-    ],
-    "mimetype": "image/png",
-    "createdAt": "2024-09-24T16:40:36.995Z"
-  },
-  {
-    "id": "0mstmOIucwiN80jb",
-    "tags": [
-      "cute",
-      "black"
-    ],
-    "mimetype": "image/jpeg",
-    "createdAt": "2023-10-25T00:04:03.771Z"
-  },
-  {
-    "id": "0mxliw1UgtFdDkU8",
-    "tags": [],
-    "mimetype": "image/jpeg",
-    "createdAt": "2020-01-24T19:54:12.268Z"
-  },
-  {
-    "id": "0nnJxjVoMK6GVmRS",
-    "tags": [],
-    "mimetype": "image/jpeg",
-    "createdAt": "2022-03-09T16:52:46.424Z"
-  },
-  {
-    "id": "0oJmiPshaDZD54M8",
-    "tags": [],
-    "mimetype": "image/jpeg",
-    "createdAt": "2019-01-14T15:24:18.445Z"
-  },
-  {
-    "id": "0PJwXcTrNzNIzGBJ",
-    "tags": [],
-    "mimetype": "image/jpeg",
-    "createdAt": "2018-07-23T11:57:25.898Z"
-  },
-  {
-    "id": "0RU7ZkgzyvWv8UJG",
-    "tags": [
-      "tuxedo",
-      "computer",
-      "sleepy",
-      "cute",
-      "sleeping"
-    ],
-    "mimetype": "image/png",
-    "createdAt": "2024-04-20T22:52:58.132Z"
-  },
-  {
-    "id": "0TnOAMpokjANBFVk",
-    "tags": [],
-    "mimetype": "image/jpeg",
-    "createdAt": "2020-11-21T14:08:33.346Z"
-  },
-  {
-    "id": "0U4jE41oGuUWThFX",
-    "tags": [],
-    "mimetype": "image/jpeg",
-    "createdAt": "2021-01-23T03:32:17.437Z"
-  },
-  {
-    "id": "0VlkBO6ValjaoeEw",
-    "tags": [],
-    "mimetype": "image/jpeg",
-    "createdAt": "2022-08-26T06:30:37.770Z"
-  }
-]
-    
-    imagem_clicada = ft.Image()
+    # LISTA DE IMAGENS 
+    # vamo testa com o json e requests
 
-    imagem_selecionada = ft.Image(
-        src="https://cataas.com/cat",
-        width=300,
-        height=300,
-        fit=ft.ImageFit.CONTAIN
-    )
-    page.add(imagem_selecionada)
+    request = requests.get("https://cataas.com/api/cats?limit=100&skip=0")
+    lista_fotos_id = []
+    dados = request.json()
 
-    for foto in lista_fotos:
+    for i in dados:
+        lista_fotos_id.append(i['id'])
 
-        # Adiciona a imagem à grid
+    for id in lista_fotos_id:
+        id_img = id
         images.controls.append(
             ft.GestureDetector(
                 content=ft.Image(
-                    src=f"https://cataas.com/cat/{foto['id']}",
+                    src=f"https://cataas.com/cat/{id_img}",
                     width=150,
                     height=150,
                     fit=ft.ImageFit.COVER,
                     border_radius=ft.border_radius.all(10),
                 ),
-                 on_tap=lambda e, s=foto['id']: imagem_selecionada.src = f"https://cataas.com/cat/{s}
+                on_tap=lambda e, s=id_img: atualizar_imagem(e, s),
+                mouse_cursor=ft.MouseCursor.CLICK
             )
         )
 
+    card = ft.Card(
+    content=ft.Container(
+        content=ft.Column(
+            controls=[
+                ft.Text("Acessos", size=20, weight="bold"),
+                ft.Text("Um cartão com uma descrição, futuramente o nome do arquivo, e o outro com um botão, sla."),
+            ],
+            spacing=10
+        ),
+        padding=20,
+        width=450,
+        bgcolor="gray",
+        border_radius=10,
+    ),
+    elevation=5
+    )
+
+    card2 = ft.Card(
+    content=ft.Container(
+        content=ft.Column(
+            controls=[
+                ft.Text("Resultado da Paleta de Cores", size=20, weight="bold"),
+                ft.Text("Paleta aqui."),
+            ],
+            spacing=10
+        ),
+        padding=20,
+        width=930,
+        bgcolor="gray",
+        border_radius=10,
+    ),
+    elevation=5
+    )
+
+        
+    layout_principal = ft.Column(
+        controls=[
+            t,
+            d,
+            ft.Row(
+                controls=[
+                    images,
+                    imagem_selecionada
+                ],
+                spacing=20,
+                alignment=ft.MainAxisAlignment.CENTER,
+                vertical_alignment=ft.CrossAxisAlignment.START,
+            ),
+            ft.Row(
+                controls=[
+                    card,
+                    card
+                ],
+                spacing=20,
+                alignment=ft.MainAxisAlignment.CENTER,
+                vertical_alignment=ft.CrossAxisAlignment.START,
+            ),
+            card2
+        ],
+        alignment=ft.MainAxisAlignment.START,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        spacing=30,
+    )
+
+    page.add(layout_principal)
 
 
-    page.add(images)
-    return images
 
-ft.app(main)
+ft.app(target=main)
