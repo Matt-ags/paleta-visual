@@ -83,7 +83,7 @@ def main(page: ft.Page):
                     border_radius=ft.border_radius.all(10),
                 ),
                 on_tap=lambda e, s=id_img: atualizar_imagem(e, s),
-                on_long_press_end=lambda e, s=id_img: link_para_imagem(s),
+                # on_long_press_end=lambda e, s=id_img: link_para_imagem(s),
                 mouse_cursor=ft.MouseCursor.CLICK
             )
         )
