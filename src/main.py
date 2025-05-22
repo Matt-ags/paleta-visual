@@ -28,8 +28,11 @@ def main(page: ft.Page):
         imagem_selecionada.src = f"https://cataas.com/cat/{s}"
         imagem_selecionada.update()
 
+    carregando = ft.Text(value="", color="black", size=16) # texto de carregando / talvez mude para um container? para usar o append.controls
     # FUNÇÃO PARA GERAR A PALETA E EXIBIR NA TELA
     def gerar_paleta(teste):
+        carregando.value = "🔄 Carregando..." # adiciona o texto de carregamento
+        carregando.update()
         id = imagem_id_selecionada["id"]
         print(f"Gerando paleta para imagem {id}")
 
@@ -71,6 +74,8 @@ def main(page: ft.Page):
             )
 
         resultado_paleta.update()
+        carregando.value = "" # depois de carregar, tira o texto
+        carregando.update()
 
     # GRID DE IMAGENS
     images = ft.GridView(
@@ -201,6 +206,7 @@ def main(page: ft.Page):
             content=ft.Column(
                 controls=[
                     ft.Text("Resultado da Paleta de Cores", size=20, weight="bold"),
+                    carregando,
                     ft.Row(controls=[resultado_paleta])
                 ],
                 spacing=10
