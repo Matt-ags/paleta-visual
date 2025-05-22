@@ -87,21 +87,54 @@ def main(page: ft.Page):
     request = requests.get("https://cataas.com/api/cats?limit=50&skip=0") # api
     dados = request.json() # salva os dados em json
 
+    imagens_controle = {}  # dicionário com id -> container da imagem
+    imagem_destacada = {"id": None}  # imagem atualmente destacada
+
     for item in dados:
         id_img = item['id']
-        images.controls.append(
+
+        imagem = ft.Image(
+            src=f"https://cataas.com/cat/{id_img}",
+            width=150,
+            height=150,
+            fit=ft.ImageFit.COVER,
+            border_radius=ft.border_radius.all(10),
+        )
+
+        container = ft.Container( # importante: tudo que usar cores, bunitinho, etc, vai no container, ele tem color, border, que da pro gasto
+            content=imagem,
+            border_radius=10,
+            padding=2,
+            bgcolor="black",  # fundo entre imagem e borda
+            border=ft.border.all(3, "transparent")
+        )
+
+        imagens_controle[id_img] = container
+
+        def criar_handler(id):
+            def handler(e):
+                atualizar_imagem(e, id) # aqui é a mesma logica de antes, atualiza a imagem grandona
+
+                # Remove destaque da imagem anterior
+                if imagem_destacada["id"]: # se já tem uma imagem destacada
+                    imagens_controle[imagem_destacada["id"]].border = ft.border.all(3, "transparent") # remove a borda
+                    imagens_controle[imagem_destacada["id"]].update() 
+
+                # Adiciona destaque na nova
+                imagens_controle[id].border = ft.border.all(3, "yellow")
+                imagens_controle[id].update()
+                imagem_destacada["id"] = id
+
+            return handler
+
+        images.controls.append( # adiciona a "imagem" no grid
             ft.GestureDetector(
-                content=ft.Image(
-                    src=f"https://cataas.com/cat/{id_img}",
-                    width=150,
-                    height=150,
-                    fit=ft.ImageFit.COVER,
-                    border_radius=ft.border_radius.all(10),
-                ),
-                on_tap=lambda e, s=id_img: atualizar_imagem(e, s),
+                content=container,
+                on_tap=criar_handler(id_img),
                 mouse_cursor=ft.MouseCursor.CLICK
             )
         )
+
     
     # CARD INICIAL - INFORMAÇÕES
     cardinfos = ft.Card(
