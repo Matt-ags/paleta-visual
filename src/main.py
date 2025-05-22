@@ -2,53 +2,79 @@ import flet as ft
 import requests
 import colorgram
 
-
 def main(page: ft.Page):
     page.bgcolor = "black"
     page.scroll = "auto"
-    id = ""
+    imagem_id_selecionada = {"id": "04eEQhDfAL8l5nt3"}  # usar dicionário para manter escopo mutável
+
+    lista_cores = []
+    resultado_paleta = ft.Row()  # Isso vai mostrar a paleta gerada (pra deixar como coluna, ou linha, meche aqui)
 
     # TÍTULO E DESCRIÇÃO
     t = ft.Text(value="Paleta Visual", color="Yellow", size=30, font_family="Arial", weight="bold")
     d = ft.Text(value="Selecione uma imagem e gere uma paleta de cores", color="White", size=25, font_family="Arial", weight="bold")
 
-
-    # IMAGEM SELECIONADA QUE APARECE EMBAIXO
     imagem_selecionada = ft.Image(
-        src="https://cataas.com/cat/04eEQhDfAL8l5nt3",  # valor padrão
+        src=f"https://cataas.com/cat/{imagem_id_selecionada['id']}",
         width=450,
         height=450,
         fit=ft.ImageFit.COVER,
         border_radius=10
     )
 
-    # FUNÇÃO PARA ATUALIZAR IMAGEM
+    # FUNÇÃO PARA ATUALIZAR IMAGEM SELECIONADA
     def atualizar_imagem(e, s):
+        imagem_id_selecionada["id"] = s  # atualiza o ID salvo
         imagem_selecionada.src = f"https://cataas.com/cat/{s}"
-        id = s
-        print(id)
-        imagem_selecionada.update() # isso que tava dando errado antes, tem que atualizar a imagem "tela" quando muda
+        imagem_selecionada.update()
 
-    # ADICIONA A FUNÇÃO DE VERIFICAR AS CORES
+    # FUNÇÃO PARA QUANDO CLICAR NO QUADRADO DA IMAGEM, MOSTRA A COR (em desenvolvimento)
+    #def mostra_cor(e):
+    #    print(f"Cor selecionada {e}")
+        # ta mostrando tudo 
 
-    def link_para_imagem(id):
-        print(id)
+    # FUNÇÃO PARA GERAR A PALETA E EXIBIR NA TELA
+    def gerar_paleta(teste):
+        id = imagem_id_selecionada["id"]
+        print(f"Gerando paleta para imagem {id}")
+
         with open('gato.jpg', 'wb') as imagem:
-            resposta = requests.get(imagem_selecionada.src, stream=True)
+            resposta = requests.get(f"https://cataas.com/cat/{id}", stream=True)
 
             if not resposta.ok:
-                print("Ocorreu um erro, status:" , resposta.status_code)
-            else:
-                for dado in resposta.iter_content(1024):
-                    if not dado:
-                        break
+                print("Erro ao baixar imagem:", resposta.status_code)
+                return
+            for dado in resposta.iter_content(1024):
+                imagem.write(dado)
 
-                    imagem.write(dado)
+        cores = colorgram.extract('gato.jpg', 6)
+        lista_cores.clear() # clear é o que limpa!
+        resultado_paleta.controls.clear()
 
-                print("Imagem salva! =)")
-        
-        colors = colorgram.extract('gato.jpg', 6)
-        print(colors)
+        for cor in cores:
+            r, g, b = cor.rgb.r, cor.rgb.g, cor.rgb.b
+            hex_color = f"#{r:02X}{g:02X}{b:02X}"
+            lista_cores.append((r, g, b))
+            resultado_paleta.controls.append(
+              
+                ft.Container(
+                    content=ft.Text(f"#{r:02X}{g:02X}{b:02X}", color="white", size=12),
+                    # on_click=mostra_cor(hex_color), de alguma forma, ele da print de todas as cores, legal, quem sabe manda pra copiar pro teclado do usuário?
+                    on_click=lambda e, s=hex_color: print(f"Cor selecionada {s}"),
+                    padding=10,
+                    margin=10,
+                    alignment=ft.alignment.center,
+                    width=80,
+                    height=80,
+                    bgcolor=hex_color,
+                    border=ft.border.all(1, "#ffffff"),
+                    border_radius=8,
+                    tooltip=hex_color
+                ),
+
+            )
+
+        resultado_paleta.update()
 
     # GRID DE IMAGENS
     images = ft.GridView(
@@ -61,18 +87,12 @@ def main(page: ft.Page):
         run_spacing=10,
     )
 
-    # LISTA DE IMAGENS 
-    # vamo testa com o json e requests
-
-    request = requests.get("https://cataas.com/api/cats?limit=100&skip=0")
-    lista_fotos_id = []
+    # LISTA DE IMAGENS
+    request = requests.get("https://cataas.com/api/cats?limit=50&skip=0")
     dados = request.json()
 
-    for i in dados:
-        lista_fotos_id.append(i['id'])
-
-    for id in lista_fotos_id:
-        id_img = id
+    for item in dados:
+        id_img = item['id']
         images.controls.append(
             ft.GestureDetector(
                 content=ft.Image(
@@ -83,45 +103,43 @@ def main(page: ft.Page):
                     border_radius=ft.border_radius.all(10),
                 ),
                 on_tap=lambda e, s=id_img: atualizar_imagem(e, s),
-                # on_long_press_end=lambda e, s=id_img: link_para_imagem(s),
                 mouse_cursor=ft.MouseCursor.CLICK
             )
         )
 
     card = ft.Card(
-    content=ft.Container(
-        content=ft.Column(
-            controls=[
-                ft.OutlinedButton("Button with 'click' event", on_click=link_para_imagem, data=0)
-            ],
-            spacing=10
+        content=ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.OutlinedButton("Gerar Paleta de Cores", on_click=gerar_paleta)
+                ],
+                spacing=10
+            ),
+            padding=20,
+            width=450,
+            bgcolor="gray",
+            border_radius=10,
         ),
-        padding=20,
-        width=450,
-        bgcolor="gray",
-        border_radius=10,
-    ),
-    elevation=5
+        elevation=5
     )
 
     card2 = ft.Card(
-    content=ft.Container(
-        content=ft.Column(
-            controls=[
-                ft.Text("Resultado da Paleta de Cores", size=20, weight="bold"),
-                ft.Text("Paleta aqui."),
-            ],
-            spacing=10
+        content=ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Text("Resultado da Paleta de Cores", size=20, weight="bold"),
+                    ft.Row(controls=[resultado_paleta])
+                ],
+                spacing=10
+            ),
+            padding=20,
+            width=930,
+            bgcolor="gray",
+            border_radius=10,
         ),
-        padding=20,
-        width=930,
-        bgcolor="gray",
-        border_radius=10,
-    ),
-    elevation=5
+        elevation=5
     )
 
-        
     layout_principal = ft.Column(
         controls=[
             t,
@@ -137,14 +155,19 @@ def main(page: ft.Page):
             ),
             ft.Row(
                 controls=[
-                    card,
                     card
                 ],
                 spacing=20,
                 alignment=ft.MainAxisAlignment.CENTER,
-                vertical_alignment=ft.CrossAxisAlignment.START,
             ),
-            card2
+            ft.Row(
+                controls=[
+                    card2
+                ],
+                spacing=20,
+                alignment=ft.MainAxisAlignment.CENTER,
+            ),
+          
         ],
         alignment=ft.MainAxisAlignment.START,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -153,11 +176,4 @@ def main(page: ft.Page):
 
     page.add(layout_principal)
 
-
-
 ft.app(target=main)
-
-# Calma ai, vamos descrever o problema:
-# queremos fazer com que ao clicar na imagem, de alguma forma, o id selecionado fica salvo,
-# quando clicarmos no botão da imagem, ele vai verificar o id, fazer uma request pro servidor, que vai retomar as cores
-# e depois disso, ele vai gerar a paleta de cores
