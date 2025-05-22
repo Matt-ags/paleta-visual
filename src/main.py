@@ -6,16 +6,14 @@ import pyperclip
 def main(page: ft.Page):
     page.bgcolor = "black"
     page.scroll = "auto"
-    imagem_id_selecionada = {"id": "04eEQhDfAL8l5nt3"}  # usar dicionário para manter escopo mutável
 
-    lista_cores = []
-    lista_cores_hex = []
+    # VARIAVEIS NECESSÁRIAS
+    imagem_id_selecionada = {"id": "04eEQhDfAL8l5nt3"}  # usar dicionário para manter escopo mutável
+    lista_cores = [] # lista de cores RGB
+    lista_cores_hex = [] # lista de cores HEX
     resultado_paleta = ft.Row()  # Isso vai mostrar a paleta gerada (pra deixar como coluna, ou linha, meche aqui)
 
-    # TÍTULO E DESCRIÇÃO
-    t = ft.Text(value="Paleta Visual", color="Yellow", size=30, font_family="Arial", weight="bold")
-    d = ft.Text(value="Selecione uma imagem e gere uma paleta de cores", color="White", size=25, font_family="Arial", weight="bold")
-
+    # FUNÇÃO PARA CARREGAR A IMAGEM SELECIONADA
     imagem_selecionada = ft.Image(
         src=f"https://cataas.com/cat/{imagem_id_selecionada['id']}",
         width=450,
@@ -29,11 +27,6 @@ def main(page: ft.Page):
         imagem_id_selecionada["id"] = s  # atualiza o ID salvo
         imagem_selecionada.src = f"https://cataas.com/cat/{s}"
         imagem_selecionada.update()
-
-    # FUNÇÃO PARA QUANDO CLICAR NO QUADRADO DA IMAGEM, MOSTRA A COR (em desenvolvimento)
-    #def mostra_cor(e):
-    #    print(f"Cor selecionada {e}")
-        # ta mostrando tudo 
 
     # FUNÇÃO PARA GERAR A PALETA E EXIBIR NA TELA
     def gerar_paleta(teste):
@@ -90,7 +83,7 @@ def main(page: ft.Page):
         run_spacing=10,
     )
 
-    # LISTA DE IMAGENS
+    # LISTA DE IMAGENS - CATAAS
     request = requests.get("https://cataas.com/api/cats?limit=50&skip=0") # api
     dados = request.json() # salva os dados em json
 
@@ -109,7 +102,29 @@ def main(page: ft.Page):
                 mouse_cursor=ft.MouseCursor.CLICK
             )
         )
+    
+    # CARD INICIAL - INFORMAÇÕES
+    cardinfos = ft.Card(
+                    content=ft.Container(
+                        content=ft.Column(
+                            controls=[
+                                ft.Text("Paleta visual", size=30, weight="bold"),
+                                ft.Text("Selecione uma imagem e gere uma paleta de cores", size=20, weight="bold"),
+                            ],
+                            spacing=10,
+                            alignment=ft.MainAxisAlignment.START,
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        ),
+                        padding=20,
+                        width=930,
+                        bgcolor="gray",
+                        border_radius=10,
+                        
+                    ),
+                    elevation=5
+                )
 
+    # CARD - BOTÕES
     card = ft.Card(
         content=ft.Container(
             content=ft.Row(
@@ -118,7 +133,9 @@ def main(page: ft.Page):
                     ft.ElevatedButton("Copiar Paleta de Cores", icon=ft.Icons.CONTENT_COPY, bgcolor="yellow", color="black", on_click=lambda e: pyperclip.copy(str(lista_cores_hex))),
                     # todo: melhorar as cores, layout
                 ],
-                spacing=10
+                spacing=10,
+                alignment=ft.MainAxisAlignment.CENTER,
+                vertical_alignment=ft.CrossAxisAlignment.START,
             ),
             padding=20,
             width=450,
@@ -127,6 +144,7 @@ def main(page: ft.Page):
         ),
         elevation=5
     )
+
     # card para depois poder anexar a imagem
     card1 = ft.Card(
         content=ft.Container(
@@ -144,6 +162,7 @@ def main(page: ft.Page):
         elevation=5
     )
 
+    # card para mostrar a paleta de cores
     card2 = ft.Card(
         content=ft.Container(
             content=ft.Column(
@@ -161,10 +180,10 @@ def main(page: ft.Page):
         elevation=5
     )
 
+    # layout principal
     layout_principal = ft.Column(
         controls=[
-            t,
-            d,
+            cardinfos,
             ft.Row(
                 controls=[
                     images,
@@ -196,6 +215,7 @@ def main(page: ft.Page):
         spacing=30,
     )
 
+    # adiciona o layout principal na página
     page.add(layout_principal)
 
 ft.app(target=main)
