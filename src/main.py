@@ -1,6 +1,7 @@
 import flet as ft
 import requests
 import colorgram
+import pyperclip
 
 def main(page: ft.Page):
     page.bgcolor = "black"
@@ -8,6 +9,7 @@ def main(page: ft.Page):
     imagem_id_selecionada = {"id": "04eEQhDfAL8l5nt3"}  # usar dicionário para manter escopo mutável
 
     lista_cores = []
+    lista_cores_hex = []
     resultado_paleta = ft.Row()  # Isso vai mostrar a paleta gerada (pra deixar como coluna, ou linha, meche aqui)
 
     # TÍTULO E DESCRIÇÃO
@@ -55,12 +57,13 @@ def main(page: ft.Page):
             r, g, b = cor.rgb.r, cor.rgb.g, cor.rgb.b
             hex_color = f"#{r:02X}{g:02X}{b:02X}"
             lista_cores.append((r, g, b))
+            lista_cores_hex.append(hex_color)
             resultado_paleta.controls.append(
               
                 ft.Container(
                     content=ft.Text(f"#{r:02X}{g:02X}{b:02X}", color="white", size=12),
                     # on_click=mostra_cor(hex_color), de alguma forma, ele da print de todas as cores, legal, quem sabe manda pra copiar pro teclado do usuário?
-                    on_click=lambda e, s=hex_color: print(f"Cor selecionada {s}"),
+                    on_click=lambda e, s=hex_color: pyperclip.copy(s), # isso só funciona localmente
                     padding=10,
                     margin=10,
                     alignment=ft.alignment.center,
@@ -88,8 +91,8 @@ def main(page: ft.Page):
     )
 
     # LISTA DE IMAGENS
-    request = requests.get("https://cataas.com/api/cats?limit=50&skip=0")
-    dados = request.json()
+    request = requests.get("https://cataas.com/api/cats?limit=50&skip=0") # api
+    dados = request.json() # salva os dados em json
 
     for item in dados:
         id_img = item['id']
@@ -109,9 +112,27 @@ def main(page: ft.Page):
 
     card = ft.Card(
         content=ft.Container(
+            content=ft.Row(
+                controls=[
+                    ft.ElevatedButton("Gerar Paleta de Cores", on_click=gerar_paleta, icon=ft.Icons.PALETTE, bgcolor="yellow", color="black"),
+                    ft.ElevatedButton("Copiar Paleta de Cores", icon=ft.Icons.CONTENT_COPY, bgcolor="yellow", color="black", on_click=lambda e: pyperclip.copy(str(lista_cores_hex))),
+                    # todo: melhorar as cores, layout
+                ],
+                spacing=10
+            ),
+            padding=20,
+            width=450,
+            bgcolor="gray",
+            border_radius=10,
+        ),
+        elevation=5
+    )
+    # card para depois poder anexar a imagem
+    card1 = ft.Card(
+        content=ft.Container(
             content=ft.Column(
                 controls=[
-                    ft.OutlinedButton("Gerar Paleta de Cores", on_click=gerar_paleta)
+                    ft.OutlinedButton("Anexar imagem")
                 ],
                 spacing=10
             ),
@@ -155,6 +176,7 @@ def main(page: ft.Page):
             ),
             ft.Row(
                 controls=[
+                    card1,
                     card
                 ],
                 spacing=20,
