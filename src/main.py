@@ -28,7 +28,7 @@ def main(page: ft.Page):
         imagem_selecionada.src = f"https://cataas.com/cat/{s}"
         imagem_selecionada.update()
 
-    carregando = ft.Text(value="", color="black", size=16) # texto de carregando / talvez mude para um container? para usar o append.controls
+    carregando = ft.Text(value="", size=16) # texto de carregando / talvez mude para um container? para usar o append.controls
     # FUNÇÃO PARA GERAR A PALETA E EXIBIR NA TELA
     def gerar_paleta(teste):
         carregando.value = "🔄 Carregando..." # adiciona o texto de carregamento
