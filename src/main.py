@@ -12,7 +12,14 @@ def main(page: ft.Page):
     imagem_id_selecionada = {"id": "04eEQhDfAL8l5nt3"}  # usar dicionário para manter escopo mutável
     lista_cores = [] # lista de cores RGB
     lista_cores_hex = [] # lista de cores HEX
-    resultado_paleta = ft.Row()  # Isso vai mostrar a paleta gerada (pra deixar como coluna, ou linha, meche aqui)
+    resultado_paleta = ft.DataTable(
+        columns=[
+                ft.DataColumn(ft.Text("ID")),
+                ft.DataColumn(ft.Text("PALETA")),
+            ],
+        rows=[],
+
+    )  # Isso vai mostrar a paleta gerada (pra deixar como coluna, ou linha, meche aqui)
 
     # bd:
     # criando o banco de dados
@@ -62,13 +69,16 @@ def main(page: ft.Page):
 
         for imagem_id, cores_hex in paletas:
             cores = cores_hex.split(",")
-            blocos_cores = [
-                ft.Container(width=20, height=20, bgcolor=cor, border_radius=4) for cor in cores
-            ]
-            controles.append(
-                ft.Row([ft.Text(f"{imagem_id}"), *blocos_cores], spacing=5)
-            )
+            resultado_paleta.rows.append(
+            ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(f"{imagem_id}")),
+                        ft.DataCell(ft.Row([ft.Container(width=20, height=20, bgcolor=cor, border_radius=4) for cor in cores], spacing=5)),
+                    ],
+                ),
+        )
 
+        
         return controles
 
     # FUNÇÃO PARA CARREGAR A IMAGEM SELECIONADA
@@ -332,5 +342,4 @@ def main(page: ft.Page):
 
     # adiciona o layout principal na página
     page.add(layout_principal)
-
 ft.app(target=main)
