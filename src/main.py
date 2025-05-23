@@ -2,6 +2,7 @@ import flet as ft
 import requests
 import colorgram
 import pyperclip
+import sqlite3
 
 def main(page: ft.Page):
     page.bgcolor = "black"
@@ -12,6 +13,63 @@ def main(page: ft.Page):
     lista_cores = [] # lista de cores RGB
     lista_cores_hex = [] # lista de cores HEX
     resultado_paleta = ft.Row()  # Isso vai mostrar a paleta gerada (pra deixar como coluna, ou linha, meche aqui)
+
+    # bd:
+    # criando o banco de dados
+
+    con = sqlite3.connect("paletas.db")
+    cur = con.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS paletas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        imagem_id TEXT,
+        cores_hex TEXT
+    )
+    """)
+
+    con.commit()
+    con.close()
+
+    # FUNÇÃO PARA SALVAR A PALETA NO BANCO DE DADOS
+
+    def salvar_paleta(imagem_id, lista_hex):
+        con = sqlite3.connect("paletas.db")
+        cur = con.cursor()
+        cores_texto = ",".join(lista_hex)  # transforma lista em string, estranho...
+        data = [imagem_id, cores_texto] # funciona quando passa para uma lista os dados a ser inseridos
+        cur.execute("INSERT INTO paletas (imagem_id, cores_hex) VALUES (?, ?)", data)
+
+        con.commit()
+        con.close()
+
+    # FUNÇÃO DE CARREGAR A PALETA DO BANCO DE DADOS
+
+    def carregar_paletas():
+        con = sqlite3.connect("paletas.db")
+        cur = con.cursor()
+        cur.execute("SELECT imagem_id, cores_hex FROM paletas ORDER BY id DESC")
+        dados = cur.fetchall()
+        con.close()
+        print(dados) # imprime os dados carregados
+        return dados
+    
+    # FUNÇÃO PARA MOSTRAR A PALETA SALVA
+
+    def mostrar_paletas_salvas():
+        paletas = carregar_paletas()
+        controles = []
+
+        for imagem_id, cores_hex in paletas:
+            cores = cores_hex.split(",")
+            blocos_cores = [
+                ft.Container(width=20, height=20, bgcolor=cor, border_radius=4) for cor in cores
+            ]
+            controles.append(
+                ft.Row([ft.Text(f"{imagem_id}"), *blocos_cores], spacing=5)
+            )
+
+        return controles
 
     # FUNÇÃO PARA CARREGAR A IMAGEM SELECIONADA
     imagem_selecionada = ft.Image(
@@ -47,6 +105,7 @@ def main(page: ft.Page):
 
         cores = colorgram.extract('gato.jpg', 6)
         lista_cores.clear() # clear é o que limpa!
+        lista_cores_hex.clear() # LIMPA A LISTA DE CORES HEX
         resultado_paleta.controls.clear()
 
         for cor in cores:
@@ -186,11 +245,14 @@ def main(page: ft.Page):
     # card para depois poder anexar a imagem
     card1 = ft.Card(
         content=ft.Container(
-            content=ft.Column(
+            content=ft.Row(
                 controls=[
-                    ft.OutlinedButton("Anexar imagem")
+                    ft.OutlinedButton("Anexar imagem"),
+                    ft.ElevatedButton("Salvar Paleta", on_click=lambda e: salvar_paleta(imagem_id_selecionada["id"], lista_cores_hex), icon=ft.Icons.SAVE, bgcolor="yellow", color="black"),
                 ],
-                spacing=10
+                spacing=10,
+                alignment=ft.MainAxisAlignment.CENTER,
+                vertical_alignment=ft.CrossAxisAlignment.START,
             ),
             padding=20,
             width=450,
@@ -247,7 +309,21 @@ def main(page: ft.Page):
                 spacing=20,
                 alignment=ft.MainAxisAlignment.CENTER,
             ),
-          
+            ft.Row(
+                controls=[
+                    ft.Column(
+                        controls=[
+                            ft.Text("Paletas Salvas", size=20, weight="bold"),
+                            *mostrar_paletas_salvas()
+                        ],
+                        spacing=10,
+                        alignment=ft.MainAxisAlignment.CENTER,
+                    )
+                ],
+                spacing=20,
+                alignment=ft.MainAxisAlignment.CENTER,
+            )
+
         ],
         alignment=ft.MainAxisAlignment.START,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
