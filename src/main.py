@@ -12,12 +12,15 @@ def main(page: ft.Page):
     imagem_id_selecionada = {"id": "04eEQhDfAL8l5nt3"}  # usar dicionário para manter escopo mutável
     lista_cores = [] # lista de cores RGB
     lista_cores_hex = [] # lista de cores HEX
-    resultado_paleta = ft.DataTable(
+    resultado_paleta = ft.Row() # lista de cores HEX para mostrar na tela
+    resultado_paleta_table = ft.DataTable(
         columns=[
-                ft.DataColumn(ft.Text("ID")),
+                ft.DataColumn(ft.Text("REFERÊNCIA")),
                 ft.DataColumn(ft.Text("PALETA")),
+                ft.DataColumn(ft.Text("AÇÕES")),
             ],
         rows=[],
+        width=800,
 
     )  # Isso vai mostrar a paleta gerada (pra deixar como coluna, ou linha, meche aqui)
 
@@ -68,15 +71,45 @@ def main(page: ft.Page):
         controles = []
 
         for imagem_id, cores_hex in paletas:
+            imagem_para_tabela = ft.Image(
+                src=f"https://cataas.com/cat/{imagem_id}",
+                width=100,
+                height=100,
+                fit=ft.ImageFit.COVER,
+                border_radius=10
+            )
             cores = cores_hex.split(",")
-            resultado_paleta.rows.append(
-            ft.DataRow(
+            resultado_paleta_table.rows.append(
+                ft.DataRow(
                     cells=[
-                        ft.DataCell(ft.Text(f"{imagem_id}")),
-                        ft.DataCell(ft.Row([ft.Container(width=20, height=20, bgcolor=cor, border_radius=4) for cor in cores], spacing=5)),
+                        ft.DataCell(
+                            ft.Container(
+                                content=ft.Row([
+                                    ft.Container(width=35, height=35, border_radius=4, content=imagem_para_tabela)
+                                ]),
+                                height=100
+                            )
+                        ),
+                        ft.DataCell(
+                            ft.Container(
+                                content=ft.Row([
+                                    ft.Container(width=35, height=35, bgcolor=cor, border_radius=4)
+                                    for cor in cores
+                                ], spacing=5),
+                                height=100
+                            )
+                        ),
+                        ft.DataCell(
+                            ft.Container(
+                                content=ft.Row([
+                                    ft.Container(width=35, height=35, border_radius=4, content=ft.ElevatedButton("Copiar Paleta de Cores", icon=ft.Icons.CONTENT_COPY, bgcolor="yellow", color="black", on_click=lambda e: pyperclip.copy(str(cores_hex)))),
+                                ], spacing=5),
+                                height=100
+                            )
+                        ),
                     ],
-                ),
-        )
+                )
+            )
 
         
         return controles
@@ -291,6 +324,28 @@ def main(page: ft.Page):
         elevation=5
     )
 
+    # card para mostrar paletas salvas
+
+    cardpaletas = ft.Card(
+                    content=ft.Container(
+                        content=ft.Column(
+                            controls=[
+                                ft.Text("Paletas Salvas", size=20, weight="bold"),
+                                ft.Row(controls=[resultado_paleta_table], alignment=ft.MainAxisAlignment.CENTER)
+                            ],
+                            spacing=10,
+                            alignment=ft.MainAxisAlignment.START,
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        ),
+                        padding=20,
+                        width=930,
+                        bgcolor="gray",
+                        border_radius=10,
+                        
+                    ),
+                    elevation=5
+                )
+
     # layout principal
     layout_principal = ft.Column(
         controls=[
@@ -319,19 +374,13 @@ def main(page: ft.Page):
                 spacing=20,
                 alignment=ft.MainAxisAlignment.CENTER,
             ),
-            ft.Row(
+            ft.Column(
                 controls=[
-                    ft.Column(
-                        controls=[
-                            ft.Text("Paletas Salvas", size=20, weight="bold"),
-                            *mostrar_paletas_salvas()
-                        ],
-                        spacing=10,
-                        alignment=ft.MainAxisAlignment.CENTER,
-                    )
+                    cardpaletas
                 ],
                 spacing=20,
                 alignment=ft.MainAxisAlignment.CENTER,
+                
             )
 
         ],
@@ -341,5 +390,6 @@ def main(page: ft.Page):
     )
 
     # adiciona o layout principal na página
+    mostrar_paletas_salvas()
     page.add(layout_principal)
 ft.app(target=main)
