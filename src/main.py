@@ -67,6 +67,7 @@ def main(page: ft.Page):
     # FUNÇÃO PARA MOSTRAR A PALETA SALVA
 
     def mostrar_paletas_salvas():
+        resultado_paleta_table.rows.clear()  # Limpa uai 
         paletas = carregar_paletas()
         controles = []
 
@@ -102,7 +103,7 @@ def main(page: ft.Page):
                         ft.DataCell(
                             ft.Container(
                                 content=ft.Row([
-                                    ft.Container(width=35, height=35, border_radius=4, content=ft.ElevatedButton("Copiar Paleta de Cores", icon=ft.Icons.CONTENT_COPY, bgcolor="yellow", color="black", on_click=lambda e: pyperclip.copy(str(cores_hex)))),
+                                    ft.Container(width=35, height=35, border_radius=4, content=ft.ElevatedButton("Copiar Paleta de Cores", icon=ft.Icons.CONTENT_COPY, bgcolor="yellow", color="black", on_click=lambda e: pyperclip.copy(str(cores_)))),
                                 ], spacing=5),
                                 height=100
                             )
@@ -111,8 +112,9 @@ def main(page: ft.Page):
                 )
             )
 
-        
+        resultado_paleta_table.update()
         return controles
+        
 
     # FUNÇÃO PARA CARREGAR A IMAGEM SELECIONADA
     imagem_selecionada = ft.Image(
@@ -291,7 +293,7 @@ def main(page: ft.Page):
             content=ft.Row(
                 controls=[
                     ft.OutlinedButton("Anexar imagem"),
-                    ft.ElevatedButton("Salvar Paleta", on_click=lambda e: salvar_paleta(imagem_id_selecionada["id"], lista_cores_hex), icon=ft.Icons.SAVE, bgcolor="yellow", color="black"),
+                    ft.ElevatedButton("Salvar Paleta", on_click=lambda e: ( salvar_paleta(imagem_id_selecionada["id"], lista_cores_hex), mostrar_paletas_salvas()), icon=ft.Icons.SAVE, bgcolor="yellow", color="black"),
                 ],
                 spacing=10,
                 alignment=ft.MainAxisAlignment.CENTER,
@@ -390,6 +392,7 @@ def main(page: ft.Page):
     )
 
     # adiciona o layout principal na página
-    mostrar_paletas_salvas()
+    
     page.add(layout_principal)
+    mostrar_paletas_salvas()
 ft.app(target=main)
