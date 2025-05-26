@@ -103,7 +103,7 @@ def main(page: ft.Page):
                         ft.DataCell(
                             ft.Container(
                                 content=ft.Row([
-                                    ft.Container(width=35, height=35, border_radius=4, content=ft.ElevatedButton("Copiar Paleta de Cores", icon=ft.Icons.CONTENT_COPY, bgcolor="yellow", color="black", on_click=lambda e: pyperclip.copy(str(cores_)))),
+                                    ft.Container(width=35, height=35, border_radius=4, content=ft.ElevatedButton("Copiar Paleta de Cores", icon=ft.Icons.CONTENT_COPY, bgcolor="yellow", color="black", on_click=lambda e: pyperclip.copy(str(cores)))),
                                 ], spacing=5),
                                 height=100
                             )
@@ -181,6 +181,46 @@ def main(page: ft.Page):
         carregando.value = "" # depois de carregar, tira o texto
         carregando.update()
 
+    # função de gerar paleta (para imagem anexada)
+    def gerar_paleta_anexada(e):
+        carregando.value = "🔄 Carregando..." # adiciona o texto de carregamento
+        carregando.update()
+        id = imagem_id_selecionada["id"]
+        print(f"Gerando paleta para imagem {id}")
+
+        cores = colorgram.extract('imagem_user.jpg', 6)
+        lista_cores.clear() # clear é o que limpa!
+        lista_cores_hex.clear() # LIMPA A LISTA DE CORES HEX
+        resultado_paleta.controls.clear()
+
+        for cor in cores:
+            r, g, b = cor.rgb.r, cor.rgb.g, cor.rgb.b
+            hex_color = f"#{r:02X}{g:02X}{b:02X}"
+            lista_cores.append((r, g, b))
+            lista_cores_hex.append(hex_color)
+            resultado_paleta.controls.append(
+              
+                ft.Container(
+                    content=ft.Text(f"#{r:02X}{g:02X}{b:02X}", color="white", size=12),
+                    # on_click=mostra_cor(hex_color), de alguma forma, ele da print de todas as cores, legal, quem sabe manda pra copiar pro teclado do usuário?
+                    on_click=lambda e, s=hex_color: pyperclip.copy(s), # isso só funciona localmente
+                    padding=10,
+                    margin=10,
+                    alignment=ft.alignment.center,
+                    width=80,
+                    height=80,
+                    bgcolor=hex_color,
+                    border=ft.border.all(1, "#ffffff"),
+                    border_radius=8,
+                    tooltip=hex_color
+                ),
+
+            )
+
+        resultado_paleta.update()
+        carregando.value = "" # depois de carregar, tira o texto
+        carregando.update()
+
     # GRID DE IMAGENS
     images = ft.GridView(
         height=450,
@@ -220,6 +260,8 @@ def main(page: ft.Page):
 
         imagens_controle[id_img] = container
 
+        # função para destacar a imagem quando clicada
+
         def criar_handler(id):
             def handler(e):
                 atualizar_imagem(e, id) # aqui é a mesma logica de antes, atualiza a imagem grandona
@@ -244,6 +286,30 @@ def main(page: ft.Page):
             )
         )
 
+    # ADICIONA FUNÇÃO PARA ANEXAR IMAGEM (ARQUIVO)
+    # Funciona localmente, sem ser web
+    def pick_files_result(e: ft.FilePickerResultEvent):
+        selected_files.value = (
+            ", ".join(map(lambda f: f.name, e.files)) if e.files else "Cancelled!"
+        )
+        selected_files.update()
+        print("Selected files:", selected_files.value)
+        print(pick_files_result)
+        with open("imagem_user.jpg", "wb") as image:
+            for file in e.files:
+                if file.path:
+                    with open(file.path, "rb") as f:
+                        image.write(f.read())
+                else:
+                    print("Error: File path is None")
+
+        
+        gerar_paleta_anexada(e)  # chama a função para gerar a paleta com a imagem anexada
+
+    pick_files_dialog = ft.FilePicker(on_result=pick_files_result)
+    selected_files = ft.Text()
+    page.overlay.append(pick_files_dialog)
+
     
     # CARD INICIAL - INFORMAÇÕES
     cardinfos = ft.Card(
@@ -265,6 +331,42 @@ def main(page: ft.Page):
                     ),
                     elevation=5
                 )
+    
+    cardinfos2 = ft.Card(
+        content=ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Text("Como funciona?", size=28, weight="bold"),
+                    ft.Text(
+                        "Este projeto utiliza a API 'Cat as a Service' (CatAs) para buscar e exibir imagens de gatos. "
+                        "Ao selecionar uma imagem e clicar em 'Gerar Paleta', a biblioteca Colorgram é utilizada para "
+                        "extrair as principais cores presentes na imagem.",
+                        size=16
+                    ),
+                    ft.Text(
+                        "Além disso, com a biblioteca Pyperclip, você pode copiar qualquer cor extraída diretamente para a área de transferência. "
+                        "Também é possível salvar as paletas geradas localmente, utilizando um banco de dados SQLite.",
+                        size=16
+                    ),
+                    ft.Text(
+                        "Executando o projeto localmente, você pode enviar suas próprias imagens e gerar paletas personalizadas com base nelas.",
+                        size=16
+                    ),
+                    ft.Divider(thickness=1, color="white"),
+                    ft.Text("Desenvolvido por: Matt-ags", size=15, italic=True),
+                    ft.Text("Obrigado por utilizar este projeto!", size=15, italic=True),
+                ],
+                spacing=15,
+                alignment=ft.MainAxisAlignment.START,
+                horizontal_alignment=ft.CrossAxisAlignment.START,
+            ),
+            padding=25,
+            width=930,
+            bgcolor="#2e2e2e",  # um cinza mais escuro para visual mais moderno
+            border_radius=12,
+        ),
+        elevation=5,
+    )
 
     # CARD - BOTÕES
     card = ft.Card(
@@ -287,12 +389,40 @@ def main(page: ft.Page):
         elevation=5
     )
 
+    # card imagem anexada:
+    card_anexo = ft.Card(
+        content=ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Text("Anexar Imagem", size=20, weight="bold"),
+                    ft.Text("Selecione uma imagem do seu computador para gerar uma paleta de cores!", size=16),
+
+                    ft.ElevatedButton( # disponivel rodando localmente
+                    "Anexar Imagem",
+                    icon=ft.Icons.UPLOAD_FILE,
+                    on_click=lambda _: pick_files_dialog.pick_files(
+                        allow_multiple=False
+                    ),
+                    ),
+                    selected_files,
+                ],
+                spacing=10,
+                alignment=ft.MainAxisAlignment.START,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+            padding=20, # padding é o espaçamento interno do card
+            width=930,  # largura do card                       
+            bgcolor="gray", # cor de fundo do card
+            border_radius=10, # borda arredondada do card
+        ),
+        elevation=5 # sombra do card
+    )
+
     # card para depois poder anexar a imagem
     card1 = ft.Card(
         content=ft.Container(
             content=ft.Row(
                 controls=[
-                    ft.OutlinedButton("Anexar imagem"),
                     ft.ElevatedButton("Salvar Paleta", on_click=lambda e: ( salvar_paleta(imagem_id_selecionada["id"], lista_cores_hex), mostrar_paletas_salvas()), icon=ft.Icons.SAVE, bgcolor="yellow", color="black"),
                 ],
                 spacing=10,
@@ -378,7 +508,9 @@ def main(page: ft.Page):
             ),
             ft.Column(
                 controls=[
-                    cardpaletas
+                    cardpaletas,
+                    card_anexo,
+                    cardinfos2
                 ],
                 spacing=20,
                 alignment=ft.MainAxisAlignment.CENTER,

@@ -13,16 +13,14 @@ def main(page: ft.Page):
         selected_files.update()
         print("Selected files:", selected_files.value)
         print(pick_files_result)
+        
         with open("gato.jpg", "wb") as image:
             for file in e.files:
+                print("Caminho do arquivo:", file.path)
                 if file.path:
                     with open(file.path, "rb") as f:
                         image.write(f.read())
-                else:
-                    print("Error: File path is None")
 
-            cores = colorgram.extract('gato.jpg', 6)
-            print(cores)
 
     pick_files_dialog = ft.FilePicker(on_result=pick_files_result)
     selected_files = ft.Text()
@@ -40,7 +38,39 @@ def main(page: ft.Page):
                 ),
                 selected_files,
             ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         )
+
+
+
+
+
+
+
     )
 
 
