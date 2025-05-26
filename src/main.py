@@ -24,6 +24,13 @@ def main(page: ft.Page):
 
     )  # Isso vai mostrar a paleta gerada (pra deixar como coluna, ou linha, meche aqui)
 
+    page.fonts = {
+        "Poppins": "https://raw.githubusercontent.com/google/fonts/master/ofl/poppins/Poppins-Regular.ttf",
+        "Inter": "https://raw.githubusercontent.com/google/fonts/master/ofl/inter/Inter-Regular.ttf"
+    }
+
+    page.theme = ft.Theme(font_family="Poppins")  # Default app font
+
     # bd:
     # criando o banco de dados
 
@@ -161,7 +168,7 @@ def main(page: ft.Page):
             resultado_paleta.controls.append(
               
                 ft.Container(
-                    content=ft.Text(f"#{r:02X}{g:02X}{b:02X}", color="white", size=12),
+                    content=ft.Text(f"#{r:02X}{g:02X}{b:02X}", color="white", size=12, font_family="Inter"),
                     # on_click=mostra_cor(hex_color), de alguma forma, ele da print de todas as cores, legal, quem sabe manda pra copiar pro teclado do usuário?
                     on_click=lambda e, s=hex_color: pyperclip.copy(s), # isso só funciona localmente
                     padding=10,
