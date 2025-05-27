@@ -2,6 +2,9 @@
 
 Um aplicativo visual interativo construído com Flet que permite gerar paletas de cores a partir de imagens de gatos (via Cataas API), salvar paletas localmente em um banco de dados SQLite, copiar cores para a área de transferência e explorar imagens adoráveis
 
+# 📸 Demonstração
+![Demonstracao](https://github.com/user-attachments/assets/6c2d0fa1-2b8b-4f20-9e20-2e7df0aef4f2)
+
 ## 🚀 Funcionalidades
 
 - 🔍 Exploração de imagens aleatórias de gatos via API do Cataas.
@@ -32,7 +35,7 @@ Um aplicativo visual interativo construído com Flet que permite gerar paletas d
 
 - pyperclip — para cópia de valores para a área de transferência
 
-## Como executar localmente:
+## 🧪 Como executar localmente:
 
 1. Clone o repositório:
 ``` bash
