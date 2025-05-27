@@ -7,11 +7,11 @@ Um aplicativo visual interativo construído com Flet que permite gerar paletas d
 
 ## 🚀 Funcionalidades
 
-- 🔍 Exploração de imagens aleatórias de gatos via API do Cataas.
+- 🔍 Exploração de imagens aleatórias de gatos via ***API do Cataas***.
 
-- 🎨 Geração de paletas de cores a partir de imagens utilizando a biblioteca colorgram.
+- 🎨 Geração de paletas de cores a partir de imagens utilizando a biblioteca ***colorgram***.
 
-- 💾 Armazenamento de paletas no banco de dados SQLite local.
+- 💾 Armazenamento de paletas no banco de dados ***SQLite*** local.
 
 - 📋 Copia rápida de cores HEX clicando na cor desejada.
 
@@ -19,7 +19,7 @@ Um aplicativo visual interativo construído com Flet que permite gerar paletas d
 
 - 🖼️ Anexar imagem local para gerar uma paleta personalizada.
 
-- ✨ Interface moderna com layout responsivo via Flet.
+- ✨ Interface moderna com layout responsivo via ***Flet***.
 
 ## 🛠️ Tecnologias Utilizadas
 
