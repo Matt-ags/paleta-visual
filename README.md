@@ -39,8 +39,7 @@ Um aplicativo visual interativo construído com Flet que permite gerar paletas d
 
 1. Clone o repositório:
 ``` bash
-  git clone https://github.com/Matt-ags/paleta-visual.git
-  cd paleta-visual
+  git clone https://github.com/Matt-ags/paleta-visual.git && cd paleta-visual
 ```
 
 2. Crie um ambiente virtual e ative:
