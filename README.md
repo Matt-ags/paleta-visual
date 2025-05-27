@@ -1,81 +1,63 @@
-# TrabalhoFlet app
+# 🎨 Paleta Visual - Gerador de Paletas de Cores com Gatos
 
-## Run the app
+Um aplicativo visual interativo construído com Flet que permite gerar paletas de cores a partir de imagens de gatos (via Cataas API), salvar paletas localmente em um banco de dados SQLite, copiar cores para a área de transferência e explorar imagens adoráveis
 
-### uv
+## 🚀 Funcionalidades
 
-Run as a desktop app:
+- 🔍 Exploração de imagens aleatórias de gatos via API do Cataas.
 
-```
-uv run flet run
-```
+- 🎨 Geração de paletas de cores a partir de imagens utilizando a biblioteca colorgram.
 
-Run as a web app:
+- 💾 Armazenamento de paletas no banco de dados SQLite local.
 
-```
-uv run flet run --web
-```
+- 📋 Copia rápida de cores HEX clicando na cor desejada.
 
-### Poetry
+- ❌ Exclusão de paletas salvas diretamente pela interface.
 
-Install dependencies from `pyproject.toml`:
+- 🖼️ Anexar imagem local para gerar uma paleta personalizada.
 
-```
-poetry install
-```
+- ✨ Interface moderna com layout responsivo via Flet.
 
-Run as a desktop app:
+## 🛠️ Tecnologias Utilizadas
 
-```
-poetry run flet run
-```
+- Python 3
 
-Run as a web app:
+- Flet — para interface gráfica
 
-```
-poetry run flet run --web
-```
+- colorgram.py — para extração de cores
 
-For more details on running the app, refer to the [Getting Started Guide](https://flet.dev/docs/getting-started/).
+- Cataas API — para imagens de gatos
 
-## Build the app
+- sqlite3 — banco de dados local
 
-### Android
+- pyperclip — para cópia de valores para a área de transferência
 
-```
-flet build apk -v
+## Como executar localmente:
+
+1. Clone o repositório:
+``` bash
+  git clone https://github.com/Matt-ags/paleta-visual.git
+  cd paleta-visual
 ```
 
-For more details on building and signing `.apk` or `.aab`, refer to the [Android Packaging Guide](https://flet.dev/docs/publish/android/).
-
-### iOS
-
-```
-flet build ipa -v
-```
-
-For more details on building and signing `.ipa`, refer to the [iOS Packaging Guide](https://flet.dev/docs/publish/ios/).
-
-### macOS
-
-```
-flet build macos -v
+2. Crie um ambiente virtual e ative:
+```bash
+  python -m venv venv
+  # Windows:
+  venv\Scripts\activate
+  # Linux/macOS:
+  source venv/bin/activate
 ```
 
-For more details on building macOS package, refer to the [macOS Packaging Guide](https://flet.dev/docs/publish/macos/).
+3. Instale as dependências:
 
-### Linux
-
-```
-flet build linux -v
+```bash
+  pip install -r requirements.txt
 ```
 
-For more details on building Linux package, refer to the [Linux Packaging Guide](https://flet.dev/docs/publish/linux/).
+4. Execute o projeto:
 
-### Windows
-
+```bash
+  flet run main.py
 ```
-flet build windows -v
-```
-
-For more details on building Windows package, refer to the [Windows Packaging Guide](https://flet.dev/docs/publish/windows/).
+  | 💡 O suporte para imagem local (anexar arquivo) funciona apenas em modo local (não via navegador/web).
