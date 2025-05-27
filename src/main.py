@@ -121,8 +121,8 @@ def main(page: ft.Page):
                             ft.Container(
                                 content=ft.Row([
                                     ft.Container(width=35, height=35, border_radius=4, content=ft.ElevatedButton("Copiar Paleta de Cores", icon=ft.Icons.CONTENT_COPY, bgcolor="yellow", color="black", on_click=lambda e: pyperclip.copy(str(cores)))),
-                                    ft.Container(width=35, height=35, border_radius=4, content=ft.ElevatedButton("Excluir Paleta", icon=ft.Icons.DELETE, bgcolor="red", color="white", on_click=lambda e: (
-                                    deletar_paleta(imagem_id),
+                                    ft.Container(width=35, height=35, border_radius=4, content=ft.ElevatedButton("Excluir Paleta", icon=ft.Icons.DELETE, bgcolor="red", color="white", on_click=lambda e, id = imagem_id: (
+                                    deletar_paleta(id),
                                     mostrar_paletas_salvas()
                                     )))
                                 ], spacing=5),
